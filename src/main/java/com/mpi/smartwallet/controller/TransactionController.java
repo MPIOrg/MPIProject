@@ -1,10 +1,13 @@
 package com.mpi.smartwallet.controller;
 
+import com.mpi.smartwallet.dto.TransactionDTO;
 import com.mpi.smartwallet.entity.Transaction;
 import com.mpi.smartwallet.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -21,12 +24,15 @@ public class TransactionController {
     }
 
     @PostMapping
-    public Transaction addTransaction(@RequestBody Transaction transaction) {
-        return transactionService.addTransaction(transaction);
+    public Transaction addTransaction(@Valid @RequestBody TransactionDTO transactionDTO) {
+        return transactionService.addTransaction(transactionDTO);
     }
 
-    @GetMapping("/user/{userId}/balance")
-    public BigDecimal getUserBalance(@PathVariable Integer userId) {
-        return transactionService.calculateUserBalance(userId);
+    @GetMapping("/user/{userId}/report")
+    public Map<String, BigDecimal> getMonthlyReport(
+            @PathVariable Integer userId,
+            @RequestParam int year,
+            @RequestParam int month) {
+        return transactionService.getMonthlyReport(userId, year, month);
     }
 }
