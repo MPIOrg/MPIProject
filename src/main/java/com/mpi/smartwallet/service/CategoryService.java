@@ -1,5 +1,6 @@
 package com.mpi.smartwallet.service;
 
+import com.mpi.smartwallet.dto.CategoryDTO;
 import com.mpi.smartwallet.entity.Category;
 import com.mpi.smartwallet.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
-    public Category createCategory(Category category) {
+    public Category createCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setName(categoryDTO.getName());
+        category.setType(categoryDTO.getType());
         return categoryRepository.save(category);
     }
 }

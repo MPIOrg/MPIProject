@@ -1,7 +1,9 @@
 package com.mpi.smartwallet.controller;
 
+import com.mpi.smartwallet.dto.CategoryDTO;
 import com.mpi.smartwallet.entity.Category;
 import com.mpi.smartwallet.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return categoryService.createCategory(category);
+    public Category createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+        return categoryService.createCategory(categoryDTO);
     }
 }

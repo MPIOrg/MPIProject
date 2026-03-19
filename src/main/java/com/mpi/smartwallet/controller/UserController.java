@@ -1,7 +1,9 @@
 package com.mpi.smartwallet.controller;
 
+import com.mpi.smartwallet.dto.UserDTO;
 import com.mpi.smartwallet.entity.User;
 import com.mpi.smartwallet.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -19,8 +21,9 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    // AICI INTERVINE VALIDAREA
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public User createUser(@Valid @RequestBody UserDTO userDTO) {
+        return userService.createUser(userDTO);
     }
 }
