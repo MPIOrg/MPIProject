@@ -33,4 +33,23 @@ public class UserService {
         
         return userRepository.save(user);
     }
+    
+ // Funcția de Login
+    public java.util.Map<String, Object> loginUser(com.mpi.smartwallet.dto.LoginDTO loginDTO) {
+        // 1. Căutăm user-ul după email
+        User user = userRepository.findByEmail(loginDTO.getEmail());
+        
+        // Dacă nu există user-ul sau parola nu se potrivește
+        if (user == null || !passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
+            throw new com.mpi.smartwallet.exception.ResourceNotFoundException("Email sau parolă incorectă!");
+        }
+
+        // 2. Dacă e totul ok, construim un răspuns curat (FĂRĂ parola hash-uită)
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("message", "Login reușit!");
+        response.put("userId", user.getId());
+        response.put("username", user.getUsername());
+        
+        return response;
+    }
 }
