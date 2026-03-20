@@ -26,4 +26,10 @@ public class UserController {
     public User createUser(@Valid @RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);
     }
+    
+ // Endpoint-ul de Login
+    @PostMapping("/login")
+    public java.util.Map<String, Object> login(@jakarta.validation.Valid @RequestBody com.mpi.smartwallet.dto.LoginDTO loginDTO) {
+        return userService.loginUser(loginDTO);
+    }
 }
