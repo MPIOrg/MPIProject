@@ -21,8 +21,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    // AICI INTERVINE VALIDAREA
-    @PostMapping
+    @PostMapping("/register") 
     public User createUser(@Valid @RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);
     }
