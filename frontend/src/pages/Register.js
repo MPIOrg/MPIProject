@@ -9,21 +9,26 @@ function Register() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
- const handleRegister = async () => {
-  if (!username || !email || !password) { setError('Please fill in all fields!'); return; }
-  try {
-    await register({ username, email, password });
-    navigate('/login');
-  } catch (err) {
-    if (err.response && err.response.status === 200) {
-      navigate('/login');
-    } else if (err.response && err.response.status === 201) {
-      navigate('/login');
-    } else {
-      navigate('/login');
+  const handleRegister = async () => {
+    // Validare simplă pe Frontend înainte de a trimite la server
+    if (!username || !email || !password) {
+      setError('Please fill in all fields!');
+      return;
     }
-  }
-};
+
+    try {
+      // Trimitem datele către API
+      await register({ username, email, password });
+
+      // Dacă cererea a reușit (status 200/201), navigăm la login
+      navigate('/login');
+    } catch (err) {
+      // Extragem mesajul de eroare setat în UserDTO sau UserService (Backend)
+      // Dacă parola e prea scurtă, aici va apărea "Parola trebuie să aibă minim 6 caractere"
+      const serverMessage = err.response?.data?.message || 'Registration failed. Please check your data.';
+      setError(serverMessage);
+    }
+  };
 
   return (
     <div style={styles.page}>
@@ -33,23 +38,38 @@ function Register() {
         <h2 style={styles.title}>SmartWallet</h2>
         <p style={styles.subtitle}>Create your account</p>
 
+        {/* Mesajul de eroare apare acum doar dacă înregistrarea chiar eșuează */}
         {error && <p style={styles.error}>{error}</p>}
 
         <div style={styles.field}>
           <label style={styles.label}>Username</label>
-          <input style={styles.input} placeholder="Choose a username"
-            value={username} onChange={e => setUsername(e.target.value)} />
+          <input
+            style={styles.input}
+            placeholder="Choose a username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
-          <input style={styles.input} type="email" placeholder="Enter your email"
-            value={email} onChange={e => setEmail(e.target.value)} />
+          <input
+            style={styles.input}
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Password</label>
-          <input style={styles.input} type="password" placeholder="Choose a password"
-            value={password} onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleRegister()} />
+          <input
+            style={styles.input}
+            type="password"
+            placeholder="Choose a password (min. 6 chars)"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleRegister()}
+          />
         </div>
 
         <button style={styles.btn} onClick={handleRegister}>Create Account</button>
@@ -88,8 +108,11 @@ const styles = {
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
   },
   subtitle: { textAlign: 'center', color: 'var(--text-dim)', fontSize: '14px', marginTop: '-12px' },
-  error: { color: 'var(--red)', fontSize: '13px', textAlign: 'center',
-    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px' },
+  error: {
+    color: '#e74c3c', fontSize: '13px', textAlign: 'center',
+    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px',
+    border: '1px solid rgba(231,76,60,0.2)'
+  },
   field: { display: 'flex', flexDirection: 'column', gap: '6px' },
   label: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '1px', textTransform: 'uppercase' },
   input: {

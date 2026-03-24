@@ -5,7 +5,7 @@ const API = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
-export const register = (data) => API.post('/api/users', data);
+export const register = (data) => API.post('/api/users/register', data);
 export const login = (data) => API.post('/api/users/login', data);
 export const getCategories = () => API.get('/api/categories');
 export const getTransactions = (userId) => API.get(`/api/transactions/user/${userId}`);
