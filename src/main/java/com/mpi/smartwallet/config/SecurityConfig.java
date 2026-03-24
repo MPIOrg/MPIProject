@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebSecurity
@@ -15,20 +16,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Oprim scutul CSRF ca să putem face cereri POST din Swagger și Frontend
+            // 1. Dezactivăm CSRF pentru a permite cererile POST din Swagger/Frontend
             .csrf(csrf -> csrf.disable())
             
-            // 2. Setăm regulile de acces (cine are voie și unde)
+            // 2. Configurăm permisiunile de acces
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Lăsăm documentația complet liberă
-                .requestMatchers("/api/**").permitAll() // Lăsăm API-ul liber (momentan, pentru dezvoltare)
+                // Permitem accesul liber la documentația Swagger
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                
+                // Permitem accesul liber DOAR la înregistrare și login
+                // Notă: Verifică dacă în Controller ai /api/users/register sau doar /api/users
+                .requestMatchers("/api/users", "/api/users/register", "/api/users/login").permitAll()
+                
+                // Orice altă cerere (ex: /api/transactions) necesită autentificare
                 .anyRequest().authenticated()
-            );
+            )
+            // 3. Activăm suportul pentru autentificare de bază (util pentru testare)
+            .httpBasic(Customizer.withDefaults());
         
         return http.build();
     }
 
-    // 3. Creăm o "mașinărie" de criptat parole, pe care o vom folosi în tot proiectul
+    // 4. Bean pentru criptarea parolelor cu BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
