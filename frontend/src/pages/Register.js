@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/api';
+import { register } from '../services/api';
 
-function Login() {
+function Register() {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    if (!username || !password) { setError('Please fill in all fields!'); return; }
+  const handleRegister = async () => {
+    if (!username || !email || !password) { setError('Please fill in all fields!'); return; }
     try {
-      const response = await login({ username, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userId', response.data.id);
-      navigate('/dashboard');
+      await register({ username, email, password });
+      navigate('/login');
     } catch {
-      setError('Invalid username or password!');
+      setError('Registration failed. Try again!');
     }
   };
 
@@ -27,27 +25,32 @@ function Login() {
       <div style={styles.card}>
         <div style={styles.logo}>💰</div>
         <h2 style={styles.title}>SmartWallet</h2>
-        <p style={styles.subtitle}>Your personal finance companion</p>
+        <p style={styles.subtitle}>Create your account</p>
 
         {error && <p style={styles.error}>{error}</p>}
 
         <div style={styles.field}>
           <label style={styles.label}>Username</label>
-          <input style={styles.input} placeholder="Enter username"
+          <input style={styles.input} placeholder="Choose a username"
             value={username} onChange={e => setUsername(e.target.value)} />
         </div>
         <div style={styles.field}>
+          <label style={styles.label}>Email</label>
+          <input style={styles.input} type="email" placeholder="Enter your email"
+            value={email} onChange={e => setEmail(e.target.value)} />
+        </div>
+        <div style={styles.field}>
           <label style={styles.label}>Password</label>
-          <input style={styles.input} type="password" placeholder="Enter password"
+          <input style={styles.input} type="password" placeholder="Choose a password"
             value={password} onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+            onKeyDown={e => e.key === 'Enter' && handleRegister()} />
         </div>
 
-        <button style={styles.btn} onClick={handleLogin}>Sign In</button>
+        <button style={styles.btn} onClick={handleRegister}>Create Account</button>
         <p style={styles.link}>
-          Don't have an account?{' '}
-          <span style={styles.linkSpan} onClick={() => navigate('/register')}>
-            Create one
+          Already have an account?{' '}
+          <span style={styles.linkSpan} onClick={() => navigate('/login')}>
+            Sign in
           </span>
         </p>
       </div>
@@ -85,8 +88,7 @@ const styles = {
   label: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '1px', textTransform: 'uppercase' },
   input: {
     background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '10px',
-    padding: '12px 16px', color: 'var(--text)', fontSize: '15px', outline: 'none',
-    transition: 'border 0.2s'
+    padding: '12px 16px', color: 'var(--text)', fontSize: '15px', outline: 'none'
   },
   btn: {
     background: 'linear-gradient(135deg, var(--gold), var(--gold-light))',
@@ -99,4 +101,4 @@ const styles = {
   linkSpan: { color: 'var(--gold)', cursor: 'pointer', fontWeight: '500' }
 };
 
-export default Login;
+export default Register;
