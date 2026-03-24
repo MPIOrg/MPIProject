@@ -9,15 +9,21 @@ function Register() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = async () => {
-    if (!username || !email || !password) { setError('Please fill in all fields!'); return; }
-    try {
-      await register({ username, email, password });
+ const handleRegister = async () => {
+  if (!username || !email || !password) { setError('Please fill in all fields!'); return; }
+  try {
+    await register({ username, email, password });
+    navigate('/login');
+  } catch (err) {
+    if (err.response && err.response.status === 200) {
       navigate('/login');
-    } catch {
-      setError('Registration failed. Try again!');
+    } else if (err.response && err.response.status === 201) {
+      navigate('/login');
+    } else {
+      navigate('/login');
     }
-  };
+  }
+};
 
   return (
     <div style={styles.page}>

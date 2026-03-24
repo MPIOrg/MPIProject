@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../services/api';
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    if (!username || !password) { setError('Please fill in all fields!'); return; }
+    if (!email || !password) { setError('Please fill in all fields!'); return; }
     try {
-      const response = await login({ username, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userId', response.data.id);
+      const response = await login({ email, password });
+      localStorage.setItem('userId', response.data.userId);
+      localStorage.setItem('username', response.data.username);
       navigate('/dashboard');
     } catch {
-      setError('Invalid username or password!');
+      setError('Invalid email or password!');
     }
   };
 
@@ -32,9 +31,9 @@ function Login() {
         {error && <p style={styles.error}>{error}</p>}
 
         <div style={styles.field}>
-          <label style={styles.label}>Username</label>
-          <input style={styles.input} placeholder="Enter username"
-            value={username} onChange={e => setUsername(e.target.value)} />
+          <label style={styles.label}>Email</label>
+          <input style={styles.input} type="email" placeholder="Enter your email"
+            value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Password</label>
@@ -85,8 +84,7 @@ const styles = {
   label: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '1px', textTransform: 'uppercase' },
   input: {
     background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: '10px',
-    padding: '12px 16px', color: 'var(--text)', fontSize: '15px', outline: 'none',
-    transition: 'border 0.2s'
+    padding: '12px 16px', color: 'var(--text)', fontSize: '15px', outline: 'none'
   },
   btn: {
     background: 'linear-gradient(135deg, var(--gold), var(--gold-light))',

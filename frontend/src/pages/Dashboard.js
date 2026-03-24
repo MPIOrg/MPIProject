@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
-import { getTransactions, addTransaction } from '../services/api';
+import { getTransactions, addTransaction, getCategories } from '../services/api';
 
-const COLORS = ['#c9a84c', '#e8c97a', '#2ecc71', '#e74c3c', '#9b59b6'];
+const COLORS = ['#c9a84c', '#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#f39c12', '#1abc9c'];
 
 function Dashboard() {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
-  const [form, setForm] = useState({ type: 'income', category: 'Salary', amount: '', date: '' });
+  const [categories, setCategories] = useState([]);
+  const [form, setForm] = useState({ categoryId: '', amount: '', date: '', description: '' });
   const [error, setError] = useState('');
 
-  useEffect(() => { fetchTransactions(); }, []);
+  useEffect(() => {
+    fetchTransactions();
+    fetchCategories();
+  }, []);
 
   const fetchTransactions = async () => {
     const userId = localStorage.getItem('userId');
@@ -19,37 +23,57 @@ function Dashboard() {
     setTransactions(response.data);
   };
 
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const fetchCategories = async () => {
+    const response = await getCategories();
+    setCategories(response.data);
+    if (response.data.length > 0) {
+      setForm(f => ({ ...f, categoryId: response.data[0].id }));
+    }
+  };
+
+  const totalIncome = transactions
+    .filter(t => t.category?.type === 'income')
+    .reduce((s, t) => s + t.amount, 0);
+
+  const totalExpense = transactions
+    .filter(t => t.category?.type === 'expense')
+    .reduce((s, t) => s + t.amount, 0);
+
   const balance = totalIncome - totalExpense;
 
-  const pieData = ['Food', 'Rent', 'Transport', 'Entertainment', 'Salary'].map(cat => ({
-    name: cat,
-    value: transactions.filter(t => t.category === cat).reduce((s, t) => s + t.amount, 0)
+  const pieData = categories.map(cat => ({
+    name: cat.name,
+    value: transactions
+      .filter(t => t.category?.id === cat.id)
+      .reduce((s, t) => s + t.amount, 0)
   })).filter(d => d.value > 0);
 
   const handleAdd = async () => {
-    if (!form.amount || !form.date) { setError('Please fill in all fields!'); return; }
+    if (!form.amount || !form.date || !form.categoryId) {
+      setError('Please fill in all fields!');
+      return;
+    }
     await addTransaction({
-      type: form.type, category: form.category,
-      amount: parseFloat(form.amount), date: form.date,
-      userId: localStorage.getItem('userId')
+      amount: parseFloat(form.amount),
+      description: form.description || categories.find(c => c.id === parseInt(form.categoryId))?.name,
+      transactionDate: form.date,
+      userId: parseInt(localStorage.getItem('userId')),
+      categoryId: parseInt(form.categoryId)
     });
     fetchTransactions();
-    setForm({ type: 'income', category: 'Salary', amount: '', date: '' });
+    setForm({ categoryId: categories[0]?.id || '', amount: '', date: '', description: '' });
     setError('');
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('username');
     navigate('/login');
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.topGlow} />
-
       <div style={styles.navbar}>
         <h2 style={styles.navLogo}>💰 SmartWallet</h2>
         <div style={styles.navActions}>
@@ -81,23 +105,18 @@ function Dashboard() {
           <h3 style={styles.cardTitle}>Add Transaction</h3>
           {error && <p style={styles.error}>{error}</p>}
           <div style={styles.formRow}>
-            <select style={styles.input} value={form.type}
-              onChange={e => setForm({ ...form, type: e.target.value })}>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
-            <select style={styles.input} value={form.category}
-              onChange={e => setForm({ ...form, category: e.target.value })}>
-              <option>Salary</option>
-              <option>Food</option>
-              <option>Rent</option>
-              <option>Transport</option>
-              <option>Entertainment</option>
+            <select style={styles.input} value={form.categoryId}
+              onChange={e => setForm({ ...form, categoryId: e.target.value })}>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name} ({cat.type})</option>
+              ))}
             </select>
             <input style={styles.input} type="number" placeholder="Amount (RON)"
               value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} />
             <input style={styles.input} type="date"
               value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+            <input style={styles.input} type="text" placeholder="Description (optional)"
+              value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
             <button style={styles.addBtn} onClick={handleAdd}>+ Add</button>
           </div>
         </div>
@@ -106,11 +125,17 @@ function Dashboard() {
           <h3 style={styles.cardTitle}>Spending by Category</h3>
           {pieData.length === 0
             ? <p style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '20px' }}>No data yet</p>
-            : <PieChart width={420} height={300}>
-                <Pie data={pieData} cx={210} cy={140} outerRadius={110} dataKey="value" label>
+            : <PieChart width={500} height={350}>
+                <Pie data={pieData} cx={250} cy={160} outerRadius={120}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={true}>
                   {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }}
+                  formatter={(value) => [`${value} RON`]}
+                />
                 <Legend wrapperStyle={{ color: 'var(--text-dim)' }} />
               </PieChart>
           }
