@@ -32,11 +32,11 @@ function Dashboard() {
   };
 
   const totalIncome = transactions
-    .filter(t => t.category?.type === 'income')
+    .filter(t => t.category?.type === 'INCOME')
     .reduce((s, t) => s + t.amount, 0);
 
   const totalExpense = transactions
-    .filter(t => t.category?.type === 'expense')
+    .filter(t => t.category?.type === 'EXPENSE')
     .reduce((s, t) => s + t.amount, 0);
 
   const balance = totalIncome - totalExpense;
@@ -126,18 +126,18 @@ function Dashboard() {
           {pieData.length === 0
             ? <p style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '20px' }}>No data yet</p>
             : <PieChart width={500} height={350}>
-                <Pie data={pieData} cx={250} cy={160} outerRadius={120}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={true}>
-                  {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }}
-                  formatter={(value) => [`${value} RON`]}
-                />
-                <Legend wrapperStyle={{ color: 'var(--text-dim)' }} />
-              </PieChart>
+              <Pie data={pieData} cx={250} cy={160} outerRadius={120}
+                dataKey="value"
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                labelLine={true}>
+                {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+              </Pie>
+              <Tooltip
+                contentStyle={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }}
+                formatter={(value) => [`${value} RON`]}
+              />
+              <Legend wrapperStyle={{ color: 'var(--text-dim)' }} />
+            </PieChart>
           }
         </div>
       </div>
@@ -209,8 +209,10 @@ const styles = {
     color: '#0a0a12', fontWeight: '700', fontSize: '14px',
     cursor: 'pointer', fontFamily: 'DM Sans, sans-serif'
   },
-  error: { color: 'var(--red)', fontSize: '13px', marginBottom: '12px',
-    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px' }
+  error: {
+    color: 'var(--red)', fontSize: '13px', marginBottom: '12px',
+    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px'
+  }
 };
 
 export default Dashboard;
