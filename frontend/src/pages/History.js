@@ -18,7 +18,7 @@ function History() {
   };
 
   const filtered = filterMonth
-    ? transactions.filter(t => t.date.startsWith(filterMonth))
+    ? transactions.filter(t => t.transactionDate?.startsWith(filterMonth))
     : transactions;
 
   const handleDelete = async (id) => {
@@ -39,12 +39,9 @@ function History() {
   return (
     <div style={styles.page}>
       <div style={styles.topGlow} />
-
       <div style={styles.navbar}>
         <h2 style={styles.navLogo}>💰 SmartWallet</h2>
-        <button style={styles.navBtn} onClick={() => navigate('/dashboard')}>
-          ← Dashboard
-        </button>
+        <button style={styles.navBtn} onClick={() => navigate('/dashboard')}>← Dashboard</button>
       </div>
 
       <div style={styles.container}>
@@ -57,9 +54,7 @@ function History() {
               value={filterMonth}
               onChange={e => setFilterMonth(e.target.value)} />
             {filterMonth && (
-              <button style={styles.clearBtn} onClick={() => setFilterMonth('')}>
-                Clear
-              </button>
+              <button style={styles.clearBtn} onClick={() => setFilterMonth('')}>Clear</button>
             )}
           </div>
         </div>
@@ -71,15 +66,16 @@ function History() {
               <div key={t.id} style={styles.row}>
                 <div style={{
                   ...styles.typeIcon,
-                  background: t.type === 'income' ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.1)',
-                  color: t.type === 'income' ? 'var(--green)' : 'var(--red)'
+                  background: t.category?.type === 'income' ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.1)',
+                  color: t.category?.type === 'income' ? 'var(--green)' : 'var(--red)'
                 }}>
-                  {t.type === 'income' ? '▲' : '▼'}
+                  {t.category?.type === 'income' ? '▲' : '▼'}
                 </div>
 
                 <div style={styles.info}>
-                  <span style={styles.category}>{t.category}</span>
-                  <span style={styles.date}>{t.date}</span>
+                  <span style={styles.category}>{t.category?.name}</span>
+                  <span style={styles.date}>{t.transactionDate}</span>
+                  {t.description && <span style={styles.desc}>{t.description}</span>}
                 </div>
 
                 {editId === t.id ? (
@@ -93,9 +89,9 @@ function History() {
                   <div style={styles.actions}>
                     <span style={{
                       ...styles.amount,
-                      color: t.type === 'income' ? 'var(--green)' : 'var(--red)'
+                      color: t.category?.type === 'income' ? 'var(--green)' : 'var(--red)'
                     }}>
-                      {t.type === 'income' ? '+' : '-'}{t.amount} RON
+                      {t.category?.type === 'income' ? '+' : '-'}{t.amount} RON
                     </span>
                     <button style={styles.editBtn} onClick={() => handleEdit(t)}>✏️</button>
                     <button style={styles.deleteBtn} onClick={() => handleDelete(t.id)}>🗑️</button>
@@ -169,6 +165,7 @@ const styles = {
   info: { display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 },
   category: { fontWeight: '500', fontSize: '15px', color: 'var(--text)' },
   date: { fontSize: '12px', color: 'var(--text-dim)' },
+  desc: { fontSize: '12px', color: 'var(--text-dim)', fontStyle: 'italic' },
   actions: { display: 'flex', alignItems: 'center', gap: '10px' },
   amount: { fontWeight: '600', fontSize: '15px', minWidth: '100px', textAlign: 'right' },
   editRow: { display: 'flex', gap: '8px', alignItems: 'center' },
