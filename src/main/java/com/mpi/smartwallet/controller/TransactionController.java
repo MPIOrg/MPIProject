@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import com.mpi.smartwallet.dto.UpdateTransactionDTO;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -35,4 +36,17 @@ public class TransactionController {
             @RequestParam int month) {
         return transactionService.getMonthlyReport(userId, year, month);
     }
+    
+    @PutMapping("/{id}")
+    public Transaction updateTransaction(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateTransactionDTO updateTransactionDTO) {
+        return transactionService.updateTransactionAmount(id, updateTransactionDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTransaction(@PathVariable Integer id) {
+        transactionService.deleteTransaction(id);
+    }
+
 }

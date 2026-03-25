@@ -9,6 +9,7 @@ import com.mpi.smartwallet.repository.CategoryRepository;
 import com.mpi.smartwallet.repository.TransactionRepository;
 import com.mpi.smartwallet.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.mpi.smartwallet.dto.UpdateTransactionDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -75,4 +76,21 @@ public class TransactionService {
 
         return report;
     }
+    
+    
+    public Transaction updateTransactionAmount(Integer id, UpdateTransactionDTO dto) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tranzacția nu a fost găsită!"));
+
+        transaction.setAmount(dto.getAmount());
+        return transactionRepository.save(transaction);
+    }
+
+    public void deleteTransaction(Integer id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tranzacția nu a fost găsită!"));
+
+        transactionRepository.delete(transaction);
+    }
+
 }
