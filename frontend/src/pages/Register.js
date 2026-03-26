@@ -46,6 +46,7 @@ function Register() {
           <input
             style={styles.input}
             placeholder="Choose a username"
+            maxLength="50"
             value={username}
             onChange={e => setUsername(e.target.value)}
           />
@@ -56,6 +57,7 @@ function Register() {
             style={styles.input}
             type="email"
             placeholder="Enter your email"
+            maxLength="50"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
@@ -66,6 +68,7 @@ function Register() {
             style={styles.input}
             type="password"
             placeholder="Choose a password (min. 6 chars)"
+            maxLength="50"
             value={password}
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleRegister()}

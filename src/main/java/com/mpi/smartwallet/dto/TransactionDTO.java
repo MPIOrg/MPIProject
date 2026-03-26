@@ -2,6 +2,8 @@ package com.mpi.smartwallet.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -11,6 +13,7 @@ public class TransactionDTO {
     @Positive(message = "Suma trebuie să fie strict pozitivă")
     private BigDecimal amount;
 
+    @Size(max = 100, message = "Descrierea nu poate depăși 100 de caractere")
     private String description;
 
     @NotNull(message = "Data tranzacției este obligatorie")

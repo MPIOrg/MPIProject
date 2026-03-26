@@ -33,12 +33,12 @@ function Login() {
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
           <input style={styles.input} type="email" placeholder="Enter your email"
-            value={email} onChange={e => setEmail(e.target.value)} />
+            maxLength="50" value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Password</label>
           <input style={styles.input} type="password" placeholder="Enter password"
-            value={password} onChange={e => setPassword(e.target.value)}
+            maxLength="50" value={password} onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleLogin()} />
         </div>
 
@@ -78,8 +78,10 @@ const styles = {
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
   },
   subtitle: { textAlign: 'center', color: 'var(--text-dim)', fontSize: '14px', marginTop: '-12px' },
-  error: { color: 'var(--red)', fontSize: '13px', textAlign: 'center',
-    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px' },
+  error: {
+    color: 'var(--red)', fontSize: '13px', textAlign: 'center',
+    background: 'rgba(231,76,60,0.1)', padding: '8px', borderRadius: '8px'
+  },
   field: { display: 'flex', flexDirection: 'column', gap: '6px' },
   label: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '1px', textTransform: 'uppercase' },
   input: {
